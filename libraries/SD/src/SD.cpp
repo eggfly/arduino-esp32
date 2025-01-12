@@ -92,12 +92,12 @@ uint64_t SDFS::totalBytes() {
   if (f_getfree(drv, &fre_clust, &fsinfo) != 0) {
     return 0;
   }
-  uint64_t size = ((uint64_t)(fsinfo->csize)) * (fsinfo->n_fatent - 2)
-#if _MAX_SS != 512
-                  * (fsinfo->ssize);
-#else
-                  * 512;
+  WORD sector_size = FF_MIN_SS; // 512
+#if FF_MAX_SS != FF_MIN_SS
+    sector_size = fs->ssize;
 #endif
+  uint64_t size = ((uint64_t)(fsinfo->csize)) * (fsinfo->n_fatent - 2)
+                  * sector_size;
   return size;
 }
 
@@ -108,12 +108,12 @@ uint64_t SDFS::usedBytes() {
   if (f_getfree(drv, &fre_clust, &fsinfo) != 0) {
     return 0;
   }
-  uint64_t size = ((uint64_t)(fsinfo->csize)) * ((fsinfo->n_fatent - 2) - (fsinfo->free_clst))
-#if _MAX_SS != 512
-                  * (fsinfo->ssize);
-#else
-                  * 512;
+  WORD sector_size = FF_MIN_SS; // 512
+#if FF_MAX_SS != FF_MIN_SS
+    sector_size = fs->ssize;
 #endif
+  uint64_t size = ((uint64_t)(fsinfo->csize)) * ((fsinfo->n_fatent - 2) - (fsinfo->free_clst))
+                  * sector_size;
   return size;
 }
 
